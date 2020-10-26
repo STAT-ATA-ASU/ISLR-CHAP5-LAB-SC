@@ -10,7 +10,7 @@ output:
 
 ```{r, label = "SETUP", echo = FALSE, results= 'hide', message = FALSE, warning = FALSE}
 library(knitr)
-knitr::opts_chunk$set(comment = NA, fig.align = 'center', fig.height = 5, fig.width = 5, prompt = FALSE, highlight = TRUE, tidy = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(comment = NA, fig.align = 'center', fig.height = 5, fig.width = 5, prompt = FALSE, highlight = TRUE, tidy = FALSE, warning = FALSE, message = FALSE, tidy.opts=list(blank = TRUE, width.cutoff = 80))
 ```
 
 # The Validation Set Approach
@@ -39,6 +39,38 @@ summary(lm.fitA)
 summary(lm.fitB)
 ```
 
+_________________
+
+## Using `caret` to accomplish the same thing
+
+```{r}
+library(caret)
+set.seed(1)
+trainIndex <- createDataPartition(y = Auto$mpg,
+                                  p = 0.5,
+                                  list = FALSE,
+                                  times = 1)
+training <- Auto[trainIndex, ]
+testing <- Auto[-trainIndex, ]
+dim(training)
+dim(testing)
+# 
+myControl1 <- trainControl(method = "none")
+myControl2 <- trainControl(method = "repeatedcv",
+                          number = 10,
+                          repeats = 5)
+#
+mod_lm <- train(mpg ~ horsepower,
+                data = training,
+                trControl = myControl1,
+                method = "lm")
+#
+mod_lm
+summary(mod_lm)
+```
+
+__________________
+
 We now use the `predict()` function to estimate the response for all 392 observations, and we use the `mean()` function to calculate the MSE of the 196 observations in the validation set. Note that the `-train` index below selects only the observations that are not in the training set.
 
 ```{r}
@@ -47,6 +79,9 @@ EMSE
 # Or
 EMSE <- mean((validSET$mpg - predict(lm.fitA, newdata = validSET))^2)
 EMSE
+# Using caret
+# Your code here to find EMSE with caret
+
 ```
 
 Therefore, the estimated test MSE for the linear regression fit is `r EMSE`. We can use the `poly()` function to estimate the test error for the polynomial and cubic regressions.
@@ -58,6 +93,8 @@ EMSE2
 # Or
 EMSE2 <- mean((validSET$mpg - predict(lm.fit2, newdata = validSET))^2)
 EMSE2
+# Or using caret
+# Your code here
 #
 lm.fit3 <- lm(mpg ~ poly(horsepower, 3), data = Auto, subset = train)
 EMSE3 <- mean((Auto$mpg - predict(lm.fit3, newdata = Auto))[-train]^2)
@@ -65,6 +102,9 @@ EMSE3
 # Or
 EMSE3 <- mean((validSET$mpg - predict(lm.fit3, newdata = validSET))^2)
 EMSE3
+# Or using caret
+# Your code here
+
 ```
 
 These error rates are `r EMSE2` and `r EMSE3`, respectively. If we choose a different training set instead, then we will obtain somewhat different errors on the validation set.
@@ -123,6 +163,17 @@ cv.err = cv.glm(data = Auto, glmfit = glm.fit)
 cv.err$delta
 ```
 
+_________
+
+```{r}
+# Using caret to find EMSE with LOOCV
+myControl3 <- trainControl(method = "LOOCV")
+
+
+```
+
+_________
+
 The `cv.glm()` function produces a list with several components. The two numbers in the delta vector contain the cross-validation results. In this `cv.glm()` case the numbers are identical (up to two decimal places) and correspond to the LOOCV statistic. Below, we discuss a situation in which the two numbers differ. Our cross-validation estimate for the test error is approximately `r cv.err$delta[1]`.
 
 We can repeat this procedure for increasingly complex polynomial fits. To automate the process, we use the `for()` function to initiate a for loop which iteratively fits polynomial regressions for polynomials of order `i = 1` to `i = 5`, computes the associated cross-validation error, and stores it in the `i`$^{\text{th}}$ element of the vector `cv.error`. We begin by initializing the vector. This command will likely take a couple of minutes to run.
@@ -135,6 +186,27 @@ for(i in 1:5){
 }
 cv.error
 ```
+
+___________
+
+```{r}
+# Using caret
+degree <- 1:5
+CV <- numeric(5)
+for(d in degree){
+f <- bquote(mpg ~ poly(horsepower, .(d)))
+mod_CV  <- train(as.formula(f),
+                  data = Auto,
+                  trControl = myControl3,
+                  method = "lm")
+CV[d] <- mod_CV$results$RMSE^2
+}
+CV
+```
+
+
+____________
+
 
 ## *k*-Fold Cross-Validation
 
@@ -149,6 +221,21 @@ for(i in 1:10){
 }
 cv.error.10
 ```
+
+_________________
+
+```{r}
+# Using caret
+myControl4 <- trainControl(method = "cv",
+                           number = 10)
+degree <- 1:10
+CV <- numeric(10)
+# You finish the code
+
+
+```
+
+___________
 
 Notice that the computation time is much shorter than that of LOOCV. (In principle, the computation time for LOOCV for a least squares linear model should be faster than for $k$-fold CV, due to the availability of $$CV_{(n)} = \frac{1}{n}\sum_{i = 1}^n\left(\frac{y_i - \hat{y}_i}{1 - h_i}\right)^2,$$ for LOOCV; however, unfortunately the `cv.glm()` function does not make use of this formula.) We still see little evidence that using cubic or higher-order polynomial terms leads to lower test error than simply using a quadratic fit.
 
@@ -190,4 +277,17 @@ CV5mod3 <- cv.glm(data = HP, glmfit = mod3, K = 5)$delta
 CV5mod3
 CV5mod3^.5
 ```
+
+____________
+
+```{r}
+# Using caret
+myControl5 <- trainControl(method = "cv",
+                           number = 5)
+# Your code here
+
+```
+
+
+____________
 
