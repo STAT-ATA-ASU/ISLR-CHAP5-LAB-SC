@@ -447,7 +447,7 @@ summary {
 
 <h1 class="title toc-ignore">Lab: Cross-Validation</h1>
 <h4 class="author">Your Name</h4>
-<h4 class="date">Last Compiled: October 26, 2020</h4>
+<h4 class="date">Last Compiled: November 05, 2020</h4>
 
 </div>
 
@@ -566,8 +566,10 @@ EMSE</code></pre>
 EMSE &lt;- mean((validSET$mpg - predict(lm.fitA, newdata = validSET))^2)
 EMSE</code></pre>
 <pre><code>[1] 23.26601</code></pre>
+<hr />
 <pre class="r"><code># Using caret
 # Your code here to find EMSE with caret</code></pre>
+<hr />
 <p>Therefore, the estimated test MSE for the linear regression fit is 23.2660086. We can use the <code>poly()</code> function to estimate the test error for the polynomial and cubic regressions.</p>
 <pre class="r"><code>lm.fit2 &lt;- lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train)
 EMSE2 &lt;- mean((Auto$mpg - predict(lm.fit2, newdata = Auto))[-train]^2)
@@ -577,10 +579,12 @@ EMSE2</code></pre>
 EMSE2 &lt;- mean((validSET$mpg - predict(lm.fit2, newdata = validSET))^2)
 EMSE2</code></pre>
 <pre><code>[1] 18.71646</code></pre>
+<hr />
 <pre class="r"><code># Or using caret
 # Your code here
-#
-lm.fit3 &lt;- lm(mpg ~ poly(horsepower, 3), data = Auto, subset = train)
+#</code></pre>
+<hr />
+<pre class="r"><code>lm.fit3 &lt;- lm(mpg ~ poly(horsepower, 3), data = Auto, subset = train)
 EMSE3 &lt;- mean((Auto$mpg - predict(lm.fit3, newdata = Auto))[-train]^2)
 EMSE3</code></pre>
 <pre><code>[1] 18.79401</code></pre>
@@ -588,8 +592,10 @@ EMSE3</code></pre>
 EMSE3 &lt;- mean((validSET$mpg - predict(lm.fit3, newdata = validSET))^2)
 EMSE3</code></pre>
 <pre><code>[1] 18.79401</code></pre>
+<hr />
 <pre class="r"><code># Or using caret
 # Your code here</code></pre>
+<hr />
 <p>These error rates are 18.7164595 and 18.7940068, respectively. If we choose a different training set instead, then we will obtain somewhat different errors on the validation set.</p>
 <pre class="r"><code>set.seed(2)
 train &lt;- sample(392, 196)

@@ -79,10 +79,17 @@ EMSE
 # Or
 EMSE <- mean((validSET$mpg - predict(lm.fitA, newdata = validSET))^2)
 EMSE
+```
+
+_____________
+
+```{r}
 # Using caret
 # Your code here to find EMSE with caret
 
 ```
+
+______________
 
 Therefore, the estimated test MSE for the linear regression fit is `r EMSE`. We can use the `poly()` function to estimate the test error for the polynomial and cubic regressions.
 
@@ -93,19 +100,36 @@ EMSE2
 # Or
 EMSE2 <- mean((validSET$mpg - predict(lm.fit2, newdata = validSET))^2)
 EMSE2
+```
+
+________________
+
+```{r}
 # Or using caret
 # Your code here
 #
+```
+
+________________
+
+```{r}
 lm.fit3 <- lm(mpg ~ poly(horsepower, 3), data = Auto, subset = train)
 EMSE3 <- mean((Auto$mpg - predict(lm.fit3, newdata = Auto))[-train]^2)
 EMSE3
 # Or
 EMSE3 <- mean((validSET$mpg - predict(lm.fit3, newdata = validSET))^2)
 EMSE3
+```
+
+________________
+
+```{r}
 # Or using caret
 # Your code here
 
 ```
+
+________________
 
 These error rates are `r EMSE2` and `r EMSE3`, respectively. If we choose a different training set instead, then we will obtain somewhat different errors on the validation set.
 
@@ -290,4 +314,3 @@ myControl5 <- trainControl(method = "cv",
 
 
 ____________
-
