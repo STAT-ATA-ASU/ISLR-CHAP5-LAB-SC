@@ -1,6 +1,6 @@
 ---
 title: 'Lab: Cross-Validation'
-author: "Your Name"
+author: "Your Name Here"
 date: 'Last Compiled: `r format(Sys.time(), "%B %d, %Y")`'
 output: 
   bookdown::html_document2: 
@@ -45,7 +45,7 @@ _________________
 
 ```{r}
 library(caret)
-set.seed(1)
+set.seed(3)
 trainIndex <- createDataPartition(y = Auto$mpg,
                                   p = 0.5,
                                   list = FALSE,
@@ -76,20 +76,22 @@ We now use the `predict()` function to estimate the response for all 392 observa
 ```{r}
 EMSE <- mean((Auto$mpg - predict(lm.fitA, newdata = Auto))[-train]^2)
 EMSE
+
 # Or
 EMSE <- mean((validSET$mpg - predict(lm.fitA, newdata = validSET))^2)
 EMSE
 ```
 
-_____________
+____________
+
+Use the `RMSE()` function from `caret` to compute the $MSE_{testing}$.
 
 ```{r}
 # Using caret
-# Your code here to find EMSE with caret
-
+RMSE(predict(mod_lm, testing), testing$mpg)^2
 ```
 
-______________
+____________
 
 Therefore, the estimated test MSE for the linear regression fit is `r EMSE`. We can use the `poly()` function to estimate the test error for the polynomial and cubic regressions.
 
@@ -102,12 +104,17 @@ EMSE2 <- mean((validSET$mpg - predict(lm.fit2, newdata = validSET))^2)
 EMSE2
 ```
 
-________________
+____________
+
+Use the `RMSE()` function from `caret` to compute the $MSE_{testing}$ for a second order polynomial model.
 
 ```{r}
-# Or using caret
-# Your code here
-#
+# Using caret
+mod_lm2  <- train(mpg ~ poly(horsepower, 2),
+                  data = training,
+                  trControl = myControl1,
+                  method = "lm")
+RMSE(predict(mod_lm2, testing), testing$mpg)^2
 ```
 
 ________________
@@ -123,9 +130,14 @@ EMSE3
 
 ________________
 
+Use the `RMSE()` function from `caret` to compute the $MSE_{testing}$ for a third order polynomial model.
+
 ```{r}
-# Or using caret
-# Your code here
+# using caret---Your CODE HERE
+
+
+
+
 
 ```
 
@@ -134,7 +146,7 @@ ________________
 These error rates are `r EMSE2` and `r EMSE3`, respectively. If we choose a different training set instead, then we will obtain somewhat different errors on the validation set.
 
 ```{r}
-set.seed(2)
+set.seed(231)
 train <- sample(392, 196)
 trainSET <- Auto[train, ]
 validSET <- Auto[-train, ]
@@ -158,7 +170,7 @@ EMSE3a <- mean((validSET$mpg - predict(lm.fit3, newdata = validSET))^2)
 EMSE3a
 ```
 
-Using this split of the observations into a training set and a validation set, we find that the validation set error rates for the models with linear, quadratic, and cubic terms are `r EMSE1a`, `r EMSE2a`, and `r EMSE3a`, respectively.
+Using this split of the observations into a **training** set and a **validation** set, we find that the validation set error rates for the models with linear, quadratic, and cubic terms are `r EMSE1a`, `r EMSE2a`, and `r EMSE3a`, respectively.
 
 These results are consistent with our previous findings: a model that predicts `mpg` using a quadratic function of `horsepower` performs better than a model that involves only a linear function of `horsepower`, and there is little evidence in favor of a model that uses a cubic function of `horsepower`.
 
@@ -184,14 +196,20 @@ yield identical linear regression models. In this lab, we will perform linear re
 library(boot)
 glm.fit <- glm(mpg ~ horsepower, data = Auto)
 cv.err = cv.glm(data = Auto, glmfit = glm.fit)
-cv.err$delta
+cv.err$delta[1]
 ```
 
 _________
 
+Use the `method = "LOOCV"` from `caret` to estimate the leave one out cross validation estimate of the test error for a model that regresses `mpg` onto `horsepower`.
+
 ```{r}
-# Using caret to find EMSE with LOOCV
+# using caret---Your CODE HERE
 myControl3 <- trainControl(method = "LOOCV")
+
+
+
+
 
 
 ```
@@ -212,6 +230,8 @@ cv.error
 ```
 
 ___________
+
+Use the `method = "LOOCV"` from `caret` to estimate the leave one out cross validation estimate of the test error for increasingly complex polynomial fits of order `i = 1` to `i = 5` that regress `mpg` onto `horsepower`.
 
 ```{r}
 # Using caret
@@ -248,13 +268,23 @@ cv.error.10
 
 _________________
 
+Use the `method = "cv"` with `number = 10` for `K= 10` folds from `caret` to estimate the 10 fold cross validation estimate of the test error for increasingly complex polynomial fits of order `i = 1` to `i = 10` that regress `mpg` onto `horsepower`.
+
 ```{r}
-# Using caret
-myControl4 <- trainControl(method = "cv",
-                           number = 10)
-degree <- 1:10
-CV <- numeric(10)
-# You finish the code
+# using caret---Your CODE HERE
+set.seed(172)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```
@@ -265,9 +295,9 @@ Notice that the computation time is much shorter than that of LOOCV. (In princip
 
 We saw in the last section that the two numbers associated with delta are essentially the same when LOOCV is performed. When we instead perform $k$-fold CV, then the two numbers associated with delta differ slightly. The first is the standard $k$-fold CV estimate, as in $$CV_{(k)} = \frac{1}{k}\sum_{i=1}^kMSE_i.$$ The second is a bias-corrected version. On this data set, the two estimates are very similar to each other.
 
-# 5-Fold Cross-Validation
+# 10-Fold Cross-Validation
 
-Compute 5-fold Cross Validation errors for `mod.be`, `mod.fs`, `mod1`, `mod2`, and `mod3` from Project 1.
+Compute 10-fold Cross Validation errors for `mod.be`, `mod.fs`, `mod1`, `mod2`, and `mod3` from Project 1.
 
 ```{r}
 site <- "http://ww2.amstat.org/publications/jse/datasets/homes76.dat.txt"
@@ -285,32 +315,71 @@ mod3 <- glm(price ~ size + lot + bath + bed + bath:bed + age + I(age^2) +
               garage + active + I(elem == 'edison') + I(elem == 'harris'), 
             data = HP)
 library(boot)
-CV5mod.be <- cv.glm(data = HP, glmfit = mod.be, K = 5)$delta
-CV5mod.be
-CV5mod.be^.5
-CV5mod.fs <- cv.glm(data = HP, glmfit = mod.fs, K = 5)$delta
-CV5mod.fs
-CV5mod.fs^.5
-CV5mod1 <- cv.glm(data = HP, glmfit = mod1, K = 5)$delta
-CV5mod1
-CV5mod1^.5
-CV5mod2 <- cv.glm(data = HP, glmfit = mod2, K = 5)$delta
-CV5mod2
-CV5mod2^.5
-CV5mod3 <- cv.glm(data = HP, glmfit = mod3, K = 5)$delta
-CV5mod3
-CV5mod3^.5
+set.seed(461)
+CV10mod.be <- cv.glm(data = HP, glmfit = mod.be, K = 10)$delta[1]
+CV10mod.be
+CV10mod.fs <- cv.glm(data = HP, glmfit = mod.fs, K = 10)$delta[1]
+CV10mod.fs
+CV10mod1 <- cv.glm(data = HP, glmfit = mod1, K = 10)$delta[1]
+CV10mod1
+CV10mod2 <- cv.glm(data = HP, glmfit = mod2, K = 10)$delta[1]
+CV10mod2
+CV10mod3 <- cv.glm(data = HP, glmfit = mod3, K = 10)$delta[1]
+CV10mod3
 ```
 
 ____________
+
+Use the `method = cv"` with `number = 10` from `caret` to estimate the ten fold cross validation estimate of the test error for the **five** models from Project 1.  
 
 ```{r}
 # Using caret
+set.seed(461)
 myControl5 <- trainControl(method = "cv",
-                           number = 5)
-# Your code here
+                           number = 10)
+mod_BE <- train(price ~ size + lot + bed + status + elem, 
+                data = HP,
+                trControl =myControl5,
+                method = "lm")
+mod_BE$results$RMSE^2
+# Finish for the other four models
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```
 
 
 ____________
+
+Complete the table below using inline R code to report your answers.
+
+Table of Results
+
+Model                  | MSE from `cv.glm()`     |  MSE from `caret`               
+-----------------------|-------------------------|-------------------------------
+Backward elimination   | `r CV10mod.be`          | `r mod_BE$results$RMSE^2`     
+Forward selection      | `r CV10mod.fs`          |  your answer
+Model 1 (`mod1`)       | `r CV10mod1`            |  your answer
+Model 2 (`mod2`)       | `r CV10mod2`            |  your answer
+Model 3 (`mod3`)       | `r CV10mod3`            |  your answer
+
+___________
+

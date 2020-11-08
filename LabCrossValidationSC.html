@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Your Name" />
+<meta name="author" content="Your Name Here" />
 
 
 <title>Lab: Cross-Validation</title>
@@ -446,8 +446,8 @@ summary {
 
 
 <h1 class="title toc-ignore">Lab: Cross-Validation</h1>
-<h4 class="author">Your Name</h4>
-<h4 class="date">Last Compiled: November 05, 2020</h4>
+<h4 class="author">Your Name Here</h4>
+<h4 class="date">Last Compiled: November 08, 2020</h4>
 
 </div>
 
@@ -508,7 +508,7 @@ F-statistic: 315.2 on 1 and 194 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div id="using-caret-to-accomplish-the-same-thing" class="section level2">
 <h2><span class="header-section-number">1.1</span> Using <code>caret</code> to accomplish the same thing</h2>
 <pre class="r"><code>library(caret)
-set.seed(1)
+set.seed(3)
 trainIndex &lt;- createDataPartition(y = Auto$mpg,
                                   p = 0.5,
                                   list = FALSE,
@@ -544,19 +544,19 @@ Call:
 lm(formula = .outcome ~ ., data = dat)
 
 Residuals:
-     Min       1Q   Median       3Q      Max 
--13.4394  -3.0937  -0.0196   2.7571  13.9037 
+    Min      1Q  Median      3Q     Max 
+-9.4938 -3.7061 -0.4894  2.9283 14.9663 
 
 Coefficients:
-             Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept) 40.011284   1.032595   38.75   &lt;2e-16 ***
-horsepower  -0.160720   0.009393  -17.11   &lt;2e-16 ***
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 40.06917    1.03089   38.87   &lt;2e-16 ***
+horsepower  -0.15575    0.00909  -17.14   &lt;2e-16 ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
-Residual standard error: 4.791 on 196 degrees of freedom
-Multiple R-squared:  0.599, Adjusted R-squared:  0.5969 
-F-statistic: 292.8 on 1 and 196 DF,  p-value: &lt; 2.2e-16</code></pre>
+Residual standard error: 5.086 on 196 degrees of freedom
+Multiple R-squared:  0.5997,    Adjusted R-squared:  0.5976 
+F-statistic: 293.6 on 1 and 196 DF,  p-value: &lt; 2.2e-16</code></pre>
 <hr />
 <p>We now use the <code>predict()</code> function to estimate the response for all 392 observations, and we use the <code>mean()</code> function to calculate the MSE of the 196 observations in the validation set. Note that the <code>-train</code> index below selects only the observations that are not in the training set.</p>
 <pre class="r"><code>EMSE &lt;- mean((Auto$mpg - predict(lm.fitA, newdata = Auto))[-train]^2)
@@ -567,8 +567,10 @@ EMSE &lt;- mean((validSET$mpg - predict(lm.fitA, newdata = validSET))^2)
 EMSE</code></pre>
 <pre><code>[1] 23.26601</code></pre>
 <hr />
+<p>Use the <code>RMSE()</code> function from <code>caret</code> to compute the <span class="math inline">\(MSE_{testing}\)</span>.</p>
 <pre class="r"><code># Using caret
-# Your code here to find EMSE with caret</code></pre>
+RMSE(predict(mod_lm, testing), testing$mpg)^2</code></pre>
+<pre><code>[1] 22.50887</code></pre>
 <hr />
 <p>Therefore, the estimated test MSE for the linear regression fit is 23.2660086. We can use the <code>poly()</code> function to estimate the test error for the polynomial and cubic regressions.</p>
 <pre class="r"><code>lm.fit2 &lt;- lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train)
@@ -580,9 +582,14 @@ EMSE2 &lt;- mean((validSET$mpg - predict(lm.fit2, newdata = validSET))^2)
 EMSE2</code></pre>
 <pre><code>[1] 18.71646</code></pre>
 <hr />
-<pre class="r"><code># Or using caret
-# Your code here
-#</code></pre>
+<p>Use the <code>RMSE()</code> function from <code>caret</code> to compute the <span class="math inline">\(MSE_{testing}\)</span> for a second order polynomial model.</p>
+<pre class="r"><code># Using caret
+mod_lm2  &lt;- train(mpg ~ poly(horsepower, 2),
+                  data = training,
+                  trControl = myControl1,
+                  method = &quot;lm&quot;)
+RMSE(predict(mod_lm2, testing), testing$mpg)^2</code></pre>
+<pre><code>[1] 19.592</code></pre>
 <hr />
 <pre class="r"><code>lm.fit3 &lt;- lm(mpg ~ poly(horsepower, 3), data = Auto, subset = train)
 EMSE3 &lt;- mean((Auto$mpg - predict(lm.fit3, newdata = Auto))[-train]^2)
@@ -593,39 +600,39 @@ EMSE3 &lt;- mean((validSET$mpg - predict(lm.fit3, newdata = validSET))^2)
 EMSE3</code></pre>
 <pre><code>[1] 18.79401</code></pre>
 <hr />
-<pre class="r"><code># Or using caret
-# Your code here</code></pre>
+<p>Use the <code>RMSE()</code> function from <code>caret</code> to compute the <span class="math inline">\(MSE_{testing}\)</span> for a third order polynomial model.</p>
+<pre class="r"><code># using caret---Your CODE HERE</code></pre>
 <hr />
 <p>These error rates are 18.7164595 and 18.7940068, respectively. If we choose a different training set instead, then we will obtain somewhat different errors on the validation set.</p>
-<pre class="r"><code>set.seed(2)
+<pre class="r"><code>set.seed(231)
 train &lt;- sample(392, 196)
 trainSET &lt;- Auto[train, ]
 validSET &lt;- Auto[-train, ]
 lm.fit1 &lt;- lm(mpg ~ horsepower, data = Auto, subset = train)
 EMSE1a &lt;- mean((Auto$mpg - predict(lm.fit1, newdata = Auto))[-train]^2)
 EMSE1a</code></pre>
-<pre><code>[1] 25.72651</code></pre>
+<pre><code>[1] 25.14997</code></pre>
 <pre class="r"><code># Or
 EMSE1a &lt;- mean((validSET$mpg - predict(lm.fit1, newdata = validSET))^2)
 EMSE1a</code></pre>
-<pre><code>[1] 25.72651</code></pre>
+<pre><code>[1] 25.14997</code></pre>
 <pre class="r"><code>lm.fit2 &lt;- lm(mpg ~ poly(horsepower, 2), data = Auto, subset = train)
 EMSE2a &lt;- mean((Auto$mpg - predict(lm.fit2, newdata = Auto))[-train]^2)
 EMSE2a</code></pre>
-<pre><code>[1] 20.43036</code></pre>
+<pre><code>[1] 21.82773</code></pre>
 <pre class="r"><code># Or
 EMSE2a &lt;- mean((validSET$mpg - predict(lm.fit2, newdata = validSET))^2)
 EMSE2a</code></pre>
-<pre><code>[1] 20.43036</code></pre>
+<pre><code>[1] 21.82773</code></pre>
 <pre class="r"><code>lm.fit3 &lt;- lm(mpg ~ poly(horsepower, 3), data = Auto, subset = train)
 EMSE3a &lt;- mean((Auto$mpg - predict(lm.fit3, newdata = Auto))[-train]^2)
 EMSE3a</code></pre>
-<pre><code>[1] 20.38533</code></pre>
+<pre><code>[1] 21.91503</code></pre>
 <pre class="r"><code># Or
 EMSE3a &lt;- mean((validSET$mpg - predict(lm.fit3, newdata = validSET))^2)
 EMSE3a</code></pre>
-<pre><code>[1] 20.38533</code></pre>
-<p>Using this split of the observations into a training set and a validation set, we find that the validation set error rates for the models with linear, quadratic, and cubic terms are 25.7265106, 20.4303643, and 20.3853269, respectively.</p>
+<pre><code>[1] 21.91503</code></pre>
+<p>Using this split of the observations into a <strong>training</strong> set and a <strong>validation</strong> set, we find that the validation set error rates for the models with linear, quadratic, and cubic terms are 25.1499689, 21.8277328, and 21.9150317, respectively.</p>
 <p>These results are consistent with our previous findings: a model that predicts <code>mpg</code> using a quadratic function of <code>horsepower</code> performs better than a model that involves only a linear function of <code>horsepower</code>, and there is little evidence in favor of a model that uses a cubic function of <code>horsepower</code>.</p>
 </div>
 </div>
@@ -645,10 +652,11 @@ coef(lm.fit)</code></pre>
 <pre class="r"><code>library(boot)
 glm.fit &lt;- glm(mpg ~ horsepower, data = Auto)
 cv.err = cv.glm(data = Auto, glmfit = glm.fit)
-cv.err$delta</code></pre>
-<pre><code>[1] 24.23151 24.23114</code></pre>
+cv.err$delta[1]</code></pre>
+<pre><code>[1] 24.23151</code></pre>
 <hr />
-<pre class="r"><code># Using caret to find EMSE with LOOCV
+<p>Use the <code>method = &quot;LOOCV&quot;</code> from <code>caret</code> to estimate the leave one out cross validation estimate of the test error for a model that regresses <code>mpg</code> onto <code>horsepower</code>.</p>
+<pre class="r"><code># using caret---Your CODE HERE
 myControl3 &lt;- trainControl(method = &quot;LOOCV&quot;)</code></pre>
 <hr />
 <p>The <code>cv.glm()</code> function produces a list with several components. The two numbers in the delta vector contain the cross-validation results. In this <code>cv.glm()</code> case the numbers are identical (up to two decimal places) and correspond to the LOOCV statistic. Below, we discuss a situation in which the two numbers differ. Our cross-validation estimate for the test error is approximately 24.2315135.</p>
@@ -661,6 +669,7 @@ for(i in 1:5){
 cv.error</code></pre>
 <pre><code>[1] 24.23151 19.24821 19.33498 19.42443 19.03321</code></pre>
 <hr />
+<p>Use the <code>method = &quot;LOOCV&quot;</code> from <code>caret</code> to estimate the leave one out cross validation estimate of the test error for increasingly complex polynomial fits of order <code>i = 1</code> to <code>i = 5</code> that regress <code>mpg</code> onto <code>horsepower</code>.</p>
 <pre class="r"><code># Using caret
 degree &lt;- 1:5
 CV &lt;- numeric(5)
@@ -688,20 +697,17 @@ cv.error.10</code></pre>
 <pre><code> [1] 24.27207 19.26909 19.34805 19.29496 19.03198 18.89781 19.12061 19.14666
  [9] 18.87013 20.95520</code></pre>
 <hr />
-<pre class="r"><code># Using caret
-myControl4 &lt;- trainControl(method = &quot;cv&quot;,
-                           number = 10)
-degree &lt;- 1:10
-CV &lt;- numeric(10)
-# You finish the code</code></pre>
+<p>Use the <code>method = &quot;cv&quot;</code> with <code>number = 10</code> for <code>K= 10</code> folds from <code>caret</code> to estimate the 10 fold cross validation estimate of the test error for increasingly complex polynomial fits of order <code>i = 1</code> to <code>i = 10</code> that regress <code>mpg</code> onto <code>horsepower</code>.</p>
+<pre class="r"><code># using caret---Your CODE HERE
+set.seed(172)</code></pre>
 <hr />
 <p>Notice that the computation time is much shorter than that of LOOCV. (In principle, the computation time for LOOCV for a least squares linear model should be faster than for <span class="math inline">\(k\)</span>-fold CV, due to the availability of <span class="math display">\[CV_{(n)} = \frac{1}{n}\sum_{i = 1}^n\left(\frac{y_i - \hat{y}_i}{1 - h_i}\right)^2,\]</span> for LOOCV; however, unfortunately the <code>cv.glm()</code> function does not make use of this formula.) We still see little evidence that using cubic or higher-order polynomial terms leads to lower test error than simply using a quadratic fit.</p>
 <p>We saw in the last section that the two numbers associated with delta are essentially the same when LOOCV is performed. When we instead perform <span class="math inline">\(k\)</span>-fold CV, then the two numbers associated with delta differ slightly. The first is the standard <span class="math inline">\(k\)</span>-fold CV estimate, as in <span class="math display">\[CV_{(k)} = \frac{1}{k}\sum_{i=1}^kMSE_i.\]</span> The second is a bias-corrected version. On this data set, the two estimates are very similar to each other.</p>
 </div>
 </div>
 <div id="fold-cross-validation" class="section level1">
-<h1><span class="header-section-number">3</span> 5-Fold Cross-Validation</h1>
-<p>Compute 5-fold Cross Validation errors for <code>mod.be</code>, <code>mod.fs</code>, <code>mod1</code>, <code>mod2</code>, and <code>mod3</code> from Project 1.</p>
+<h1><span class="header-section-number">3</span> 10-Fold Cross-Validation</h1>
+<p>Compute 10-fold Cross Validation errors for <code>mod.be</code>, <code>mod.fs</code>, <code>mod1</code>, <code>mod2</code>, and <code>mod3</code> from Project 1.</p>
 <pre class="r"><code>site &lt;- &quot;http://ww2.amstat.org/publications/jse/datasets/homes76.dat.txt&quot;
 HP &lt;- read.table(file = site, header = TRUE)
 # Removing indicated columns
@@ -717,36 +723,74 @@ mod3 &lt;- glm(price ~ size + lot + bath + bed + bath:bed + age + I(age^2) +
               garage + active + I(elem == &#39;edison&#39;) + I(elem == &#39;harris&#39;), 
             data = HP)
 library(boot)
-CV5mod.be &lt;- cv.glm(data = HP, glmfit = mod.be, K = 5)$delta
-CV5mod.be</code></pre>
-<pre><code>[1] 2510.110 2412.535</code></pre>
-<pre class="r"><code>CV5mod.be^.5</code></pre>
-<pre><code>[1] 50.10100 49.11757</code></pre>
-<pre class="r"><code>CV5mod.fs &lt;- cv.glm(data = HP, glmfit = mod.fs, K = 5)$delta
-CV5mod.fs</code></pre>
-<pre><code>[1] 3080.387 2890.335</code></pre>
-<pre class="r"><code>CV5mod.fs^.5</code></pre>
-<pre><code>[1] 55.50123 53.76184</code></pre>
-<pre class="r"><code>CV5mod1 &lt;- cv.glm(data = HP, glmfit = mod1, K = 5)$delta
-CV5mod1</code></pre>
-<pre><code>[1] 2722.216 2592.291</code></pre>
-<pre class="r"><code>CV5mod1^.5</code></pre>
-<pre><code>[1] 52.17486 50.91455</code></pre>
-<pre class="r"><code>CV5mod2 &lt;- cv.glm(data = HP, glmfit = mod2, K = 5)$delta
-CV5mod2</code></pre>
-<pre><code>[1] 2558.226 2406.288</code></pre>
-<pre class="r"><code>CV5mod2^.5</code></pre>
-<pre><code>[1] 50.57890 49.05393</code></pre>
-<pre class="r"><code>CV5mod3 &lt;- cv.glm(data = HP, glmfit = mod3, K = 5)$delta
-CV5mod3</code></pre>
-<pre><code>[1] 2359.433 2243.945</code></pre>
-<pre class="r"><code>CV5mod3^.5</code></pre>
-<pre><code>[1] 48.57399 47.37029</code></pre>
+set.seed(461)
+CV10mod.be &lt;- cv.glm(data = HP, glmfit = mod.be, K = 10)$delta[1]
+CV10mod.be</code></pre>
+<pre><code>[1] 2372.26</code></pre>
+<pre class="r"><code>CV10mod.fs &lt;- cv.glm(data = HP, glmfit = mod.fs, K = 10)$delta[1]
+CV10mod.fs</code></pre>
+<pre><code>[1] 2416.15</code></pre>
+<pre class="r"><code>CV10mod1 &lt;- cv.glm(data = HP, glmfit = mod1, K = 10)$delta[1]
+CV10mod1</code></pre>
+<pre><code>[1] 2844.668</code></pre>
+<pre class="r"><code>CV10mod2 &lt;- cv.glm(data = HP, glmfit = mod2, K = 10)$delta[1]
+CV10mod2</code></pre>
+<pre><code>[1] 2639.653</code></pre>
+<pre class="r"><code>CV10mod3 &lt;- cv.glm(data = HP, glmfit = mod3, K = 10)$delta[1]
+CV10mod3</code></pre>
+<pre><code>[1] 2297.885</code></pre>
 <hr />
+<p>Use the <code>method = cv&quot;</code> with <code>number = 10</code> from <code>caret</code> to estimate the ten fold cross validation estimate of the test error for the <strong>five</strong> models from Project 1.</p>
 <pre class="r"><code># Using caret
+set.seed(461)
 myControl5 &lt;- trainControl(method = &quot;cv&quot;,
-                           number = 5)
-# Your code here</code></pre>
+                           number = 10)
+mod_BE &lt;- train(price ~ size + lot + bed + status + elem, 
+                data = HP,
+                trControl =myControl5,
+                method = &quot;lm&quot;)
+mod_BE$results$RMSE^2</code></pre>
+<pre><code>[1] 2142.238</code></pre>
+<pre class="r"><code># Finish for the other four models</code></pre>
+<hr />
+<p>Complete the table below using inline R code to report your answers.</p>
+<p>Table of Results</p>
+<table>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>MSE from <code>cv.glm()</code></th>
+<th>MSE from <code>caret</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Backward elimination</td>
+<td>2372.2604784</td>
+<td>2142.2378462</td>
+</tr>
+<tr class="even">
+<td>Forward selection</td>
+<td>2416.1496526</td>
+<td>your answer</td>
+</tr>
+<tr class="odd">
+<td>Model 1 (<code>mod1</code>)</td>
+<td>2844.667606</td>
+<td>your answer</td>
+</tr>
+<tr class="even">
+<td>Model 2 (<code>mod2</code>)</td>
+<td>2639.6525457</td>
+<td>your answer</td>
+</tr>
+<tr class="odd">
+<td>Model 3 (<code>mod3</code>)</td>
+<td>2297.8847554</td>
+<td>your answer</td>
+</tr>
+</tbody>
+</table>
 <hr />
 </div>
 
