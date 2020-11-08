@@ -373,13 +373,12 @@ Complete the table below using inline R code to report your answers.
 
 Table of Results
 
-Model                  | MSE from `cv.glm()`     |  MSE from `caret`               
------------------------|-------------------------|-------------------------------
-Backward elimination   | `r CV10mod.be`          | `r mod_BE$results$RMSE^2`     
-Forward selection      | `r CV10mod.fs`          |  your answer
-Model 1 (`mod1`)       | `r CV10mod1`            |  your answer
-Model 2 (`mod2`)       | `r CV10mod2`            |  your answer
-Model 3 (`mod3`)       | `r CV10mod3`            |  your answer
-
+Model                  | MSE from `cv.glm()`              |  MSE from `caret`               
+-----------------------|----------------------------------|-------------------------------
+Backward elimination   | `r round(CV10mod.be,2)`          | `r round(mod_BE$results$RMSE^2,2)`     
+Forward selection      | `r round(CV10mod.fs,2)`          |  Your answer
+Model 1 (`mod1`)       | `r round(CV10mod1,2)`            |  Your answer
+Model 2 (`mod2`)       | `r round(CV10mod2,2)`            |  Your answer
+Model 3 (`mod3`)       | `r round(CV10mod3,2)`            |  Your answer
 ___________
 
